@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Ouche Nation - Chargement</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+      -webkit-app-region: drag;
+    }
+
+    .container {
+      text-align: center;
+      width: 450px;
+      -webkit-app-region: no-drag;
+    }
+
+    .logo {
+      font-size: 80px;
+      margin-bottom: 30px;
+      animation: float 3s ease-in-out infinite;
+      filter: drop-shadow(0 0 20px rgba(100, 149, 237, 0.5));
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-15px); }
+    }
+
+    h1 {
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 15px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: 2px;
+    }
+
+    .version {
+      color: rgba(255, 255, 255, 0.5);
+      font-size: 12px;
+      margin-bottom: 40px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .status {
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 14px;
+      margin-bottom: 25px;
+      min-height: 20px;
+      font-weight: 500;
+    }
+
+    .progress-container {
+      width: 100%;
+      margin-bottom: 15px;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+      width: 0%;
+      transition: width 0.3s ease;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(102, 126, 234, 0.5);
+    }
+
+    .file-name {
+      color: rgba(255, 255, 255, 0.4);
+      font-size: 11px;
+      font-family: 'Courier New', monospace;
+      min-height: 15px;
+      margin-top: 10px;
+    }
+
+    .logs {
+      margin-top: 30px;
+      padding: 15px;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 8px;
+      max-height: 100px;
+      overflow-y: auto;
+      text-align: left;
+    }
+
+    .log-entry {
+      font-size: 10px;
+      color: rgba(255, 255, 255, 0.6);
+      font-family: 'Courier New', monospace;
+      margin: 3px 0;
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-right: 8px;
+      vertical-align: middle;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="logo">⚔️</div>
+    <h1>OUCHE NATION</h1>
+    <p class="version">Launcher v1.0.0</p>
+    
+    <p class="status">
+      <span class="spinner"></span>
+      <span id="status">Initialisation...</span>
+    </p>
+    
+    <div class="progress-container">
+      <div class="progress-bar">
+        <div class="progress-fill" id="progress"></div>
+      </div>
+    </div>
+    
+    <p class="file-name" id="file"></p>
+
+    <div class="logs" id="logs"></div>
+  </div>
+
+  <script>
+    const { ipcRenderer } = require('electron');
+
+    ipcRenderer.on('update-status', (event, message) => {
+      document.getElementById('status').textContent = message;
+    });
+
+    ipcRenderer.on('update-progress', (event, data) => {
+      document.getElementById('progress').style.width = data.percent + '%';
+      document.getElementById('file').textContent = data.file;
+    });
+
+    ipcRenderer.on('update-log', (event, message) => {
+      const logs = document.getElementById('logs');
+      const entry = document.createElement('div');
+      entry.className = 'log-entry';
+      entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+      logs.appendChild(entry);
+      logs.scrollTop = logs.scrollHeight;
+    });
+  </script>
+</body>
+</html>
+
+└── version.json       ← Hashes des fichiers
